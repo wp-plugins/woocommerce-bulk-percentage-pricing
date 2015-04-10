@@ -44,50 +44,44 @@ function wbpp_bulk_percentage_pricing_setup_admin() {
  * @since 0.1
  */
 function wbpp_bulk_percentage_pricing_options_page() {
-/*	wp_localize_script('wbpp_script', 'myAjax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' )));  
-	wp_enqueue_script( 'wbpp_script' );*/
 	wp_enqueue_script('wbpp_bootstrap', plugin_dir_url( __FILE__ ) . 'assets/bootstrap/js/bootstrap.js', array('jquery'));
 	wp_enqueue_script('wbpp_bootstrap_tagsinput', plugin_dir_url( __FILE__ ) . 'assets/bootstrap-tagsinput/bootstrap-tagsinput.js', array('jquery'));	
-	/**/
 	wp_register_script('wbpp_js', plugin_dir_url( __FILE__ ) . 'assets/javascript.js', array('jquery'));	
 	wp_localize_script( 'wbpp_js', 'myAjax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' )));        
 	wp_enqueue_script( 'wbpp_js' );
-	/**/
-	//wp_enqueue_script('wbpp_js', plugin_dir_url( __FILE__ ) . 'assets/javascript.js', array('jquery'));	
 	wp_enqueue_style( 'wbpp_style', plugin_dir_url( __FILE__ ) . 'assets/style.css');
 	wp_enqueue_style( 'wbpp_style_bootstrap', plugin_dir_url( __FILE__ ) . 'assets/bootstrap/css/bootstrap.css');
 	wp_enqueue_style( 'wbpp_style_bootstrap_theme', plugin_dir_url( __FILE__ ) . 'assets/bootstrap/css/bootstrap-theme.css');
 	wp_enqueue_style( 'wbpp_style_bootstrap_tagsinput', plugin_dir_url( __FILE__ ) . 'assets/bootstrap-tagsinput/bootstrap-tagsinput.css');
-
 	$taxonomy = 'product_cat';
-$orderby = 'name';
-$show_count = 0; // 1 for yes, 0 for no
-$pad_counts = 0; // 1 for yes, 0 for no
-$hierarchical = 1; // 1 for yes, 0 for no
-$title = '';
-$empty = 0;
+	$orderby = 'name';
+	$show_count = 0; // 1 for yes, 0 for no
+	$pad_counts = 0; // 1 for yes, 0 for no
+	$hierarchical = 1; // 1 for yes, 0 for no
+	$title = '';
+	$empty = 0;
 
-$args = array(
-'taxonomy' => $taxonomy,
-'orderby' => $orderby,
-'show_count' => $show_count,
-'pad_counts' => $pad_counts,
-'hierarchical' => $hierarchical,
-'title_li' => $title,
-'hide_empty' => $empty
-);
-$all_categories = get_categories( $args );
-$all_products=array();
-$args = array(
-        'post_type' => 'product',
-        'posts_per_page' => -1
-    );
-    $loop = new WP_Query( $args );
-if ( $loop->have_posts() ): while ( $loop->have_posts() ): $loop->the_post();
-global $product;
-$all_products[$product->id]=$product->get_title();
-endwhile; endif; wp_reset_postdata();
-	?>
+	$args = array(
+	'taxonomy' => $taxonomy,
+	'orderby' => $orderby,
+	'show_count' => $show_count,
+	'pad_counts' => $pad_counts,
+	'hierarchical' => $hierarchical,
+	'title_li' => $title,
+	'hide_empty' => $empty
+	);
+	$all_categories = get_categories( $args );
+	$all_products=array();
+	$args = array(
+	        'post_type' => 'product',
+	        'posts_per_page' => -1
+	    );
+	    $loop = new WP_Query( $args );
+	if ( $loop->have_posts() ): while ( $loop->have_posts() ): $loop->the_post();
+	global $product;
+	$all_products[$product->id]=$product->get_title();
+	endwhile; endif; wp_reset_postdata();
+		?>
 	<div class="wrap">
 		<div class="panel panel-default">
 			<div class="panel-heading">
