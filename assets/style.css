@@ -1,0 +1,35 @@
+
+	.boxed {
+	  margin: 30px;
+	}
+	.wp-admin select[multiple] {
+	  height: 200px;
+	  font-size: x-large;
+	  color: gray;
+	}
+	label {
+	  font-family: sans-serif;
+	  font-size: large;
+	  color: darkgray;
+	  font-weight: bold;
+	}
+
+ 	.mode-panel select {
+	  display: block;
+	  width: 100%
+	} 
+
+	.select-container
+	{
+		display: inline
+	}
+
+	.select-container select,.select-container input ,.bootstrap-tagsinput
+	{
+		width:100%;
+	} 
+
+
+	#loader{
+		display: none;
+	}
