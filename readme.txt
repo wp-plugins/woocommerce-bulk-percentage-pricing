@@ -1,4 +1,4 @@
-=== Woocommerce bulk percentage pricing ===
+=== WooCommerce Bulk Percentage Pricing ===
 
 Donate link: http://atastypixel.com/blog/wordpress/plugins/woocommerce-bulk-percentage-pricing/
 Tags: WooCommerce, Pricing, Bulk,percentage 
