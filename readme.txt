@@ -33,9 +33,9 @@ Yes , you can.
 Regular price will change also.
 
 == Screenshots ==
-1. All products screenshot-1.png .
-2. Specific categories products screenshot-2.png .
-3. Specific products products screenshot-3.png .
+1. All products.
+2. Specific categories.
+3. Specific products.
 
 
 
