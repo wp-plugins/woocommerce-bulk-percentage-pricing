@@ -86,7 +86,7 @@ function wbpp_bulk_percentage_pricing_options_page() {
 	<div class="wrap">
 		<div class="panel panel-default">
 			<div class="panel-heading">
-					<h3 class="panel-title">Choose between following methods :</h3>
+					<h3 class="panel-title">Choose between following methods:</h3>
 			</div>
 			<div class="panel-body">
 				<ul class="nav nav-pills">
@@ -115,7 +115,7 @@ function wbpp_bulk_percentage_pricing_options_page() {
 
 
 	<div class="boxed mode-panel" id="specific_products">
-	<label>Pleas select peoduct/products to add</label>
+	<label>Please select product/products to add</label>
 	<div class="select-container"> 
 	<select multiple id="add_products"  class="chosen-select">
 	<?php
