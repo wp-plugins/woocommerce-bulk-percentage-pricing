@@ -3,7 +3,7 @@
 Plugin Name: Woocommerce bulk percentage pricing
 Plugin URI: http://atastypixel.com/blog/wordpress/plugins/woocommerce-bulk-percentage-pricing/
 Description: Instead of slow pricing methods, you can now automatically update your store prices for all products at once by percentage.
-Version: 1.0
+Version: 2.0
 Author: Hussam Hussien
 Author URI: http://hussam7ussien.blogspot.com/
 */
@@ -45,14 +45,15 @@ function wbpp_bulk_percentage_pricing_setup_admin() {
  */
 function wbpp_bulk_percentage_pricing_options_page() {
 	wp_enqueue_script('wbpp_bootstrap', plugin_dir_url( __FILE__ ) . 'assets/bootstrap/js/bootstrap.js', array('jquery'));
-	wp_enqueue_script('wbpp_bootstrap_tagsinput', plugin_dir_url( __FILE__ ) . 'assets/bootstrap-tagsinput/bootstrap-tagsinput.js', array('jquery'));	
+	wp_enqueue_script('chosen.jquery.min.js','https://cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.jquery.min.js', array('jquery'));	
 	wp_register_script('wbpp_js', plugin_dir_url( __FILE__ ) . 'assets/javascript.js', array('jquery'));	
 	wp_localize_script( 'wbpp_js', 'myAjax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' )));        
 	wp_enqueue_script( 'wbpp_js' );
 	wp_enqueue_style( 'wbpp_style', plugin_dir_url( __FILE__ ) . 'assets/style.css');
 	wp_enqueue_style( 'wbpp_style_bootstrap', plugin_dir_url( __FILE__ ) . 'assets/bootstrap/css/bootstrap.css');
 	wp_enqueue_style( 'wbpp_style_bootstrap_theme', plugin_dir_url( __FILE__ ) . 'assets/bootstrap/css/bootstrap-theme.css');
-	wp_enqueue_style( 'wbpp_style_bootstrap_tagsinput', plugin_dir_url( __FILE__ ) . 'assets/bootstrap-tagsinput/bootstrap-tagsinput.css');
+	wp_enqueue_style( 'chosen.min.css','https://cdnjs.cloudflare.com/ajax/libs/chosen/1.4.2/chosen.min.css');
+
 	$taxonomy = 'product_cat';
 	$orderby = 'name';
 	$show_count = 0; // 1 for yes, 0 for no
@@ -100,7 +101,7 @@ function wbpp_bulk_percentage_pricing_options_page() {
 	<div class="boxed mode-panel" id="specific_categories">
 	<div class="select-container">
 	<label>Pleas select category/categories to add</label>
-	<select multiple id="add_categories">
+	<select multiple id="add_categories" class="chosen-select">
 	<?php
 	foreach ($all_categories as $cat)
 	{
@@ -109,16 +110,14 @@ function wbpp_bulk_percentage_pricing_options_page() {
 	}
 	?>
 	</select>
-	<input type="submit" value=">>" name="add_categories" select="add_categories" class="add-elements">
 	</div>
-	<input type="text" name="add_categories_input"  id="add_categories_input" />
 	</div>
 
 
 	<div class="boxed mode-panel" id="specific_products">
 	<label>Pleas select peoduct/products to add</label>
 	<div class="select-container"> 
-	<select multiple id="add_products" >
+	<select multiple id="add_products"  class="chosen-select">
 	<?php
 	foreach ($all_products as $key => $product)
 	{
@@ -126,9 +125,7 @@ function wbpp_bulk_percentage_pricing_options_page() {
 	}
 	?>
 	</select>
-	<input type="submit" value=">>" name="add_products" select="add_products" class="add-elements">
 	</div>
-	<input type="text"   name="add_products_input" id="add_products_input" />
 	</div>
 	<div class="boxed" id="percentage_form">
 	<form method="post" action="<?php esc_url( $_SERVER['REQUEST_URI'] ); ?>">
@@ -143,11 +140,12 @@ function wbpp_bulk_percentage_pricing_options_page() {
 			
 		</td>
 	</tr>
-	
+
 	</table>
 	<img src="<?php echo  plugin_dir_url( __FILE__ ) . 'assets/images/ajax-loader_2.gif'; ?>" id="loader">
 	<p class="submit">
-	<input type="submit" name="percentge-submit" id="percentge-submit" value="<?php _e('Apply Changes') ?>" />
+	<input type="submit" name="increase-percentge-submit" id="increase-percentge-submit"  class="percentge-submit" value="<?php _e('Increase Prices') ?>" />
+	<input type="submit" name="discount-percentge-submit" id="discount-percentge-submit"  class="percentge-submit" value="<?php _e('Discount Prices') ?>" />
 	</p>
 	</form>
 	<div class="updated" style="display:none;">
@@ -159,17 +157,15 @@ function wbpp_bulk_percentage_pricing_options_page() {
 }
 
 function wbpp_apply_percentge() {	
-		$response['response']="falied";
+		$response['response']='Failed';
 		//get operation type
 		$operation=$_POST["operation"];
         // sanitize percentage value
         $percentage  =$_POST["percentage"];
 		$args = array( 'post_type' => 'product', 'posts_per_page' => -1 );
-        if($operation=="all_products"):
-		$args = array( 'post_type' => 'product', 'posts_per_page' => -1 );
-		elseif($operation=="specific_products"):
+		if($operation=="specific_products"):
 		$args['post__in']=$_POST['values'];
-		else:
+		elseif($operation=="specific_categories"):
 		$args['tax_query'] = array(
 		array(
 			'taxonomy' => 'product_cat',
@@ -181,21 +177,30 @@ function wbpp_apply_percentge() {
 		query_posts( $args );
 		while ( have_posts() ) : the_post();
 			$product = new WC_Product( get_the_ID() );
+			if($_POST['type']=='increase-percentge-submit'):
+				$regular_price = $product->regular_price;
+				$product_price = $product->price;
+				if($percentage>=0):
+					$new_regular_price=$regular_price+(($regular_price*$percentage )/100);
+					$new_product_price=$product_price+(($product_price*$percentage )/100);
+				elseif($percentage<0):
+					$percentage*=-1;
+					$new_regular_price=$regular_price-(($regular_price*$percentage )/100);
+					$new_product_price=$product_price-(($product_price*$percentage )/100);
+				endif;	
+				update_post_meta(  get_the_ID(), '_regular_price', $new_regular_price );
+				update_post_meta(  get_the_ID(), '_price', $new_product_price );
+			else:
+			if($percentage<0)
+				$percentage*=-1;
 			$regular_price = $product->regular_price;
-			$product_price = $product->price;
-			if($percentage>=0):
-			$new_regular_price=$regular_price+(($regular_price*$percentage )/100);
-			$new_product_price=$product_price+(($product_price*$percentage )/100);
-			elseif($percentage<0):
-			$percentage*=-1;
-			$new_regular_price=$regular_price-(($regular_price*$percentage )/100);
-			$new_product_price=$product_price-(($product_price*$percentage )/100);
-			endif;	
-			update_post_meta(  get_the_ID(), '_regular_price', $new_regular_price );
-			update_post_meta(  get_the_ID(), '_price', $new_product_price );
+			$sale_price=$regular_price-(($regular_price*$percentage )/100);
+			update_post_meta(  get_the_ID(), '_sale_price', $sale_price );
+			update_post_meta(  get_the_ID(), '_price', $sale_price );
+			endif;
 		endwhile;
 	    header( "Content-Type: application/json" );
-	    $response['response']="SUCCESS - Percentage : ".$percentage."% applied successfully";
+	  	$response['response']="SUCCESS - Percentage : ".$percentage."% applied successfully";
 	    echo json_encode($response);
 
 	    //Don't forget to always exit in the ajax function.
@@ -206,18 +211,26 @@ function wbpp_apply_percentge() {
 
 	function wbpp_apply_percentge1(){
 
-	    $reponse = array();
-	    if(!empty($_POST['operation'])){
-	         $response['response'] = "I've get the operation a its value is ".$_POST['operation'].' and the plugin url is '.plugins_url();
-	    } else {
-	         $response['response'] = "You didn't send the operation";
-	    }
+				$response['response']=0;
+				//get operation type
+				$operation=$_POST["operation"];
+		        // sanitize percentage value
+		        $percentage  =$_POST["percentage"];
+				$args = array( 'post_type' => 'product', 'posts_per_page' => -1 );
 
-	    header( "Content-Type: application/json" );
-	    echo json_encode($response);
+				
+				query_posts( $args );
+				while ( have_posts() ) : the_post();
+					$product = new WC_Product( get_the_ID() );
+					$response['response']+=1;
+					
+				endwhile;
+			    header( "Content-Type: application/json" );
+			    //$response['response']="SUCCESS - Percentage : ".$percentage."% applied successfully";
+			    echo json_encode($response);
 
-	    //Don't forget to always exit in the ajax function.
-	    exit();
+			    //Don't forget to always exit in the ajax function.
+			    exit();
 
 	}
 

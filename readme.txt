@@ -4,7 +4,7 @@ Donate link: http://atastypixel.com/blog/wordpress/plugins/woocommerce-bulk-perc
 Tags: WooCommerce, Pricing, Bulk,percentage 
 Requires at least: 2.6
 Tested up to: 4.1.1
-Stable tag: 1.0
+Stable tag: 2.0
 
 Automatically update your store prices for all products at once by percentage.
 
@@ -31,6 +31,10 @@ Yes , you can.
 = What about regular price? =
 
 Regular price will change also.
+
+= Can i discount/sale prices? =
+
+Yes , you can.
 
 == Screenshots ==
 1. All products.

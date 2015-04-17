@@ -1,5 +1,8 @@
 jQuery(document).ready(function($) {
+  $(".chosen-select").chosen({
+  	placeholder_text_multiple:"Search .. "
 
+  	});
 	//called when key is pressed in textbox
   $("#percentage").keypress(function (e) {
     //if the letter is not digit then display error and don't type anything
@@ -21,55 +24,30 @@ jQuery(document).ready(function($) {
 		  return false;		  
 
 	});
-	//Add tags to tags container
-	$('.add-elements').on('click', function(){
-		var select_id=$(this).attr('select');
-		var elt = $('#'+select_id+'_input');
-		elt.tagsinput({
-		  itemValue: 'value',
-		  itemText: 'text',
-		 
-		});
-		var value=$('#'+select_id).val();
-		
-		var items = $("#"+select_id+" option:selected").map(function() {
-			var t=$(this).text();
-			var v=$(this).val();
-		    return [[t,v]];
-		}).get();
-
-	$.each(items, function(index, array) {
-		
-		elt.tagsinput('add', { "value": array[1] , "text": array[0]  });
-
-	});
-
-	}); 
 
 	//Apply percentage actoin 
 
-	$('#percentge-submit').on('click',function(){
+	$('.percentge-submit').on('click',function(){
 
 		$('#loader').css('display','block');
 		$('.submit').css('display','none');
+		var type=$(this).attr('name');
 	    var operation=$("li.active").attr('name');
 		var percentage=$("#percentage").val();
 		var values=new Array();
 		if(operation=="specific_categories"){
-			values=$("#add_categories_input").val();
-			values=values.split(',');
+			values=$("#add_categories").val();
 		}
 
 		else if(operation=="specific_products")
 		{
-			values=$("#add_products_input").val();
-			values=values.split(',');
+			values=$("#add_products").val();
 		}
 			
 		jQuery.ajax({
-		type: "POST",
+		type: "post",
 		url: ajaxurl,
-		data: { action: 'wbpp_apply_percentge' , operation: operation ,percentage:percentage,values:values}
+		data: { action: 'wbpp_apply_percentge' , operation: operation ,percentage:percentage,values:values,type:type}
 		}).done(function( msg ) {
 		$('#loader').css('display','none');
 		$('.submit').css('display','block');
